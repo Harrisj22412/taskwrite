@@ -4,6 +4,7 @@ import { PencilIcon } from "@heroicons/react/24/solid";
 import Button from "./Button";
 
 const Navbar = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const navigate = useNavigate();
 
     return (
@@ -19,7 +20,7 @@ const Navbar = () => {
                         iconClasses="text-main"
                     />
                 </Link>
-                </Link>
+                
                 <div className="flex items-center justify-between gap-6">
                     <Link
                         to="/tasks"
