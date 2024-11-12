@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { HfInference } from "@huggingface/inference";
-
+import { HuggingFaceStream, StreamingTextResponse } from "ai";
 // Create a new HuggingFace Inference instance
 const Hf = new HfInference(import.meta.env.VITE_HUGGINGFACE_KEY);
 
@@ -13,7 +13,6 @@ export const callAI = async (prompt: string) => {
 		inputs: `<|prompter|>${prompt}<|endoftext|><|assistant|>`,
 		parameters: {
 			max_new_tokens: 200,
-			// @ts-ignore (this is a valid parameter specifically in OpenAssistant models)
 			typical_p: 0.2,
 			repetition_penalty: 1,
 			truncate: 1000,
@@ -21,5 +20,7 @@ export const callAI = async (prompt: string) => {
 		},
 	});
 
-	return response;
+    const stream = HuggingFaceStream(response);
+
+	return new StreamingTextResponse(stream);
 };

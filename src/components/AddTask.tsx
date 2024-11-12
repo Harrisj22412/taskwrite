@@ -3,6 +3,7 @@ import Select from "./Select";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 import { createDocument } from "../utils/db.ts";
+import { SparklesIcon } from "@heroicons/react/24/solid";
 
 interface ITaskFormProps {
     task: ITask | null;
@@ -95,6 +96,37 @@ useEffect(() => {
         }
     };
 
+    const generateDesc = async () => {
+        setTextAreaVal("");
+    
+        if (!titleVal) {
+        alert("Please provide a title for the task");
+        return;
+        }
+    
+        setIsGenerating(true);
+    
+        const prompt = `Provide a description for this task: ${titleVal}. Keep the description to a maximum of 30 words`;
+    
+        try {
+            const res = await callAI(prompt);
+            const responseText = await res.text();
+    
+            setIsGenerating(false);
+    
+            //create a typing effect
+            responseText.split("").forEach((char, index) => {
+            setTimeout(() => {
+            setTextAreaVal((prevText) => prevText + char);
+            }, index * 32);
+            });
+        } catch (error) {
+            console.log("ERROR HUGGING FACE API: " + error);
+        }
+    };
+
+    const [isGenerating, setIsGenerating] = useState(false);
+
     return (
             <form id="form" onSubmit={handleSubmitTask} className="m-8">
                 <div className="flex flex-col mb-6">
@@ -123,7 +155,7 @@ useEffect(() => {
                         id="description"
                         placeholder="Describe your task"
                         maxLength={200}
-                        value={textAreaVal}
+                        value={isGenerating ? "generating..." : textAreaVal}
                         onChange={(e) => setTextAreaVal(e.target.value)}
                         className={`bg-inherit border rounded-sm p-2 h-32 resize-none                             focus:outline-none focus:ring-1 ${
                                     textAreaVal.length > 197
@@ -136,6 +168,14 @@ useEffect(() => {
                         Warning description getting too long. Can only be 200 characters
                     </span>
                     )}
+                    <Button
+    handleClick={generateDesc}
+    disable={isGenerating}
+    extraBtnClasses="bg-light mt-2 w-fit ml-auto"
+>
+    <span>Generate description</span>
+    <SparklesIcon height={20} />
+</Button>
                 </div>
                 <div className="flex flex-col mb-6">
                     <label htmlFor="description" className="mb-1">
