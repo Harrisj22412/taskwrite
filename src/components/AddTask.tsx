@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import Select from "./Select";
 import Button from "./Button";
+import Speaker from "./Speaker";
 import { useNavigate } from "react-router-dom";
 import { createDocument } from "../utils/db.ts";
+import{ useSpeechToTextHelper } from "../hooks/useSpeechToTextHelper";
 import { SparklesIcon } from "@heroicons/react/24/solid";
 
 interface ITaskFormProps {
@@ -12,6 +14,9 @@ interface ITaskFormProps {
 }
 
 const AddTask = ({task, isEdit, setTasks}: ITaskFormProps) => {
+    const navigate = useNavigate();
+    const { transcript, resetTranscript } = useSpeechToTextHelper();
+
     const [titleVal, setTitleVal] = useState("");
     const [textAreaVal, setTextAreaVal] = useState("");
     const [dueDate, setDueDate] = useState(
@@ -24,19 +29,19 @@ const AddTask = ({task, isEdit, setTasks}: ITaskFormProps) => {
         isEdit && task?.priority ? task?.priority : priorityArray[0]
     ));
 
-    const navigate = useNavigate();
+   
 
 const [isSubmitting, setIsSubmitting] = useState(false);
 const [titleValidationError, setTitleValidationError] = useState("");
 
 useEffect(() => {
-    if (isEdit && task) {
+    if (isEdit && task && !transcript) {
         setTitleVal(task.title);
         setTextAreaVal(task.description);
     } else {
-        setTitleVal("");
+        setTitleVal(transcript ||"");
     }
-}, [isEdit, task]);
+}, [isEdit, task, transcript]);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitleVal(e.target.value);
@@ -44,6 +49,10 @@ useEffect(() => {
         if (e.target.value.trim() !== "") {
             setTitleValidationError("");
         }
+    };
+
+    const clearTranscript = () => {
+        resetTranscript();
     };
 
     const handleSubmitTask = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -114,7 +123,6 @@ useEffect(() => {
     
             setIsGenerating(false);
     
-            //create a typing effect
             responseText.split("").forEach((char, index) => {
             setTimeout(() => {
             setTextAreaVal((prevText) => prevText + char);
@@ -129,8 +137,9 @@ useEffect(() => {
 
     return (
             <form id="form" onSubmit={handleSubmitTask} className="m-8">
-                <div className="flex flex-col mb-6">
+                <div className="flex flex-row justify-between items-center">
                     <label htmlFor="title">Task Title</label>
+                    <Speaker handleClear={clearTranscript} />
                     <input
                         type="text"
                         id="title"
