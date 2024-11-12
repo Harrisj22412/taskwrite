@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getTasks } from "../utils/shared";
+import  TaskItem  from "../components/TaskItem";
 
 const Task = () => {
 

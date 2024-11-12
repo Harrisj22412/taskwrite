@@ -1,3 +1,8 @@
+import { useState } from "react";
+import  Button  from "./Button";
+import { deleteDocument} from "../utils/db";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
+
 interface TaskItemProps {
     task: ITask;
     setTasks?: (tasks: ITask[]) => void;
