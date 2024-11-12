@@ -1,13 +1,21 @@
 import { useState } from "react";
 import  Button  from "./Button";
+import { useNavigate } from "react-router-dom";
 import { deleteDocument} from "../utils/db";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
 
 interface TaskItemProps {
-    task: ITask;
-    setTasks?: (tasks: ITask[]) => void;
+    isViewTask: boolean; handleViewTask?: (e: React.MouseEvent<HTMLDivElement>) => void;  
 }
-function TaskItem({ task }: TaskItemProps) {
+
+function TaskItem({
+	task,
+	setTasks,
+	isViewTask = false,
+	handleViewTask,
+}: TaskItemProps) {
+	const navigate = useNavigate();
+
 
     const [isDone, setIsDone] = useState(false);
 
@@ -20,13 +28,24 @@ function TaskItem({ task }: TaskItemProps) {
         }
     };
 
+    const handleEdit = async (
+        currentTask: ITask
+    ) => {
+        navigate("/", { state: { task: currentTask } });
+    };
+
     const handleDelete = async (
         e: React.MouseEvent<HTMLButtonElement>,
         currentTaskId: string
     ) => {
+        e.stopPropagation();
         try {
             await deleteDocument(currentTaskId);
-            updateTasks();
+            if (isViewTask) {
+                navigate(0);
+            } else {
+                updateTasks();
+            }
         } catch (error) {
             console.error(error);
         }
@@ -58,6 +77,7 @@ function TaskItem({ task }: TaskItemProps) {
     return (
     <>
         <div className="m-8 cursor-pointer border border-container rounded-md p-4 hover:shadow-lg transition duration-300 ease-in-out max-h-96">
+        onClick={handleViewTask}
             <section
             key={task.$id}
             className="flex flex-col justify-between gap-2 my-4 h-full"
@@ -80,6 +100,7 @@ function TaskItem({ task }: TaskItemProps) {
                 </span>
                 )}
                 <div className="flex gap-2 py-1 ml-auto">
+                    {!task.done && (
                     <Button
                         handleClick={() => handleEdit(task)}
                         extraBtnClasses="bg-ok"
@@ -87,6 +108,7 @@ function TaskItem({ task }: TaskItemProps) {
                         <span className="font-medium">Edit</span>
                         <PencilSquareIcon height={25} className="hidden lg:flex" />
                     </Button>
+                    )}
                     <Button
                         handleClick={(e) => handleDelete(e, task.$id)}
                         extraBtnClasses="bg-highPriority"
@@ -101,7 +123,7 @@ function TaskItem({ task }: TaskItemProps) {
                     {task.title}
                 </h2>
                 <p className="py-1 mb-4 min-h-16 break-words">
-                    {task.description.length > 70
+                    {task.description.length > 70 && !isViewTask
                         ? task.description.substring(0, 70) + "..."
                         : task.description}
                 </p>

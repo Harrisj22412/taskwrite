@@ -7,6 +7,17 @@ const Task = () => {
     const [tasks, setTasks] = useState<ITask[]>([]);
     const [tasksError, setTasksError] = useState("");
 
+    const [isViewTask, setIsViewTask] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<ITask>();
+
+    const handleViewTask = (
+        e: React.MouseEvent<HTMLDivElement>,
+        activeTask: ITask
+    ) => {
+        setIsViewTask(true);
+        setSelectedTask(activeTask);
+    };
+
 useEffect(() => {
         getTasks()
         .then((res) => {
@@ -21,6 +32,18 @@ useEffect(() => {
     return (
         <main className="container mx-auto">
     <section className="max-w-5xl mx-auto m-12 p-16">
+    {isViewTask && selectedTask && (
+            <Dialog key={selectedTask.$id} setIsViewTask={setIsViewTask}>
+                <TaskItem
+                    task={selectedTask}
+                    handleViewTask={() => handleViewTask(selectedTask!)}
+                    isViewTask={isViewTask}
+                />
+            </Dialog>
+        )}
+        <h1 className="text-4xl md:text-7xl font-bold text-center py-3 mb-16">
+        Your Tasks
+        </h1>
         <h1 className="text-4xl md:text-7xl font-bold text-center py-3 mb-16">
         Your Tasks
         </h1>
@@ -34,7 +57,12 @@ useEffect(() => {
                          {tasks
                              .filter((task) => !task.done)
                              .map((task) => (
-                                <TaskItem key={task.$id} task={task} />
+                                <TaskItem key={task.$id} 
+                                task={task}
+                                setTasks={setTasks}
+            handleViewTask={() => handleViewTask(task)}
+            isViewTask={isViewTask}
+                                 />
                          ))}
                     </div>
                 </div>

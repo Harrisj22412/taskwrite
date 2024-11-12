@@ -1,22 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Select from "./Select";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 import { createDocument } from "../utils/db.ts";
 
-const AddTask = () => {
+interface ITaskFormProps {
+    task: ITask | null;
+    isEdit?: boolean;
+    setTasks?: (tasks: ITask[]) => void;
+}
+
+const AddTask = ({task, isEdit, setTasks}: ITaskFormProps) => {
     const [titleVal, setTitleVal] = useState("");
     const [textAreaVal, setTextAreaVal] = useState("");
-    const [dueDate, setDueDate] = useState(new Date());
+    const [dueDate, setDueDate] = useState(
+        isEdit && task?.due_date ? new Date(task.due_date) : new Date()
+    );
 
     const priorityArray = ["low", "medium", "high"];
 
-    const [priority, setPriority] = useState(priorityArray[0]);
+    const [priority, setPriority] = useState((
+        isEdit && task?.priority ? task?.priority : priorityArray[0]
+    ));
 
     const navigate = useNavigate();
 
 const [isSubmitting, setIsSubmitting] = useState(false);
 const [titleValidationError, setTitleValidationError] = useState("");
+
+useEffect(() => {
+    if (isEdit && task) {
+        setTitleVal(task.title);
+        setTextAreaVal(task.description);
+    } else {
+        setTitleVal("");
+    }
+}, [isEdit, task]);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitleVal(e.target.value);
@@ -54,7 +73,13 @@ const [titleValidationError, setTitleValidationError] = useState("");
                 priority: priority,
             };
 
-            await createDocument(payload);
+            if (isEdit && task) {
+                await updateDocument(payload, task!.$id);
+                const allTasks = await getTasks();
+                if (setTasks) return setTasks(allTasks.reverse());
+            } else {
+                await createDocument(payload);
+            }
 
             // reset form
             setTitleVal("");
@@ -141,7 +166,7 @@ const [titleValidationError, setTitleValidationError] = useState("");
                     extraBtnClasses="bg-primary justify-center text-white font-semibold px-4 py-2 outline-1 hover:bg-primaryHover focus:ring-1 focus:ring-pink-800 w-full"
                 >
                     <span>
-                        Add Task
+                    {isSubmitting ? "Submitting..." : task ? "Edit Task" : "Add Task"}
                     </span>
                 </Button>
             </form>
