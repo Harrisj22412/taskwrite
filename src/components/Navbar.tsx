@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { Link, useNavigate } from "react-router-dom";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import Button from "./Button";
 
 const Navbar = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const navigate = useNavigate();
 
     return (

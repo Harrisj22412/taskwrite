@@ -1,72 +1,18 @@
 import { useState } from "react";
 import Select from "./Select";
 import Button from "./Button";
-import { useNavigate } from "react-router-dom";
 
-const AddTask = ({ priorityArray, createDocument }) => {
-    const [priority, setPriority] = useState(priorityArray[0]);
+const AddTask = () => {
     const [titleVal, setTitleVal] = useState("");
     const [textAreaVal, setTextAreaVal] = useState("");
     const [dueDate, setDueDate] = useState(new Date());
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [titleValidationError, setTitleValidationError] = useState("");
 
-    const navigate = useNavigate();
+    const priorityArray = ["low", "medium", "high"];
 
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitleVal(e.target.value);
-
-        if (e.target.value.trim() !== "") {
-            setTitleValidationError("");
-        }
-    };
-
-    const handleSubmitTask = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-
-        try {
-            if (!titleVal) {
-                setTitleValidationError("Please provide at least a title for the task");
-                setTimeout(() => setTitleValidationError(""), 2000);
-                setIsSubmitting(false);
-                return;
-            }
-
-            if (titleVal.length > 49) {
-                setTitleValidationError(
-                    "Title too long. It can only be 49 characters long"
-                );
-                setTimeout(() => setTitleValidationError(""), 2000);
-                setIsSubmitting(false);
-                return;
-            }
-
-            const payload: IPayload = {
-                title: titleVal,
-                description: textAreaVal,
-                due_date: dueDate,
-                priority: priority,
-            };
-
-            await createDocument(payload);
-
-            // reset form
-            setTitleVal("");
-            setTextAreaVal("");
-            setDueDate(new Date());
-            setPriority(priorityArray[0]);
-            setTitleValidationError("");
-            setIsSubmitting(false);
-            navigate("/tasks");
-        } catch (error) {
-            console.error("Error in handleSubmitTask:", error);
-            setIsSubmitting(false);
-        }
-    };
+    const [priority, setPriority] = useState(priorityArray[0]);
 
     return (
-        <form id="form" onSubmit={handleSubmitTask} className="m-8">
+        <form id="form" className="m-8">
             <div className="flex flex-col mb-6">
                 <label htmlFor="title">Task Title</label>
                 <input
@@ -74,17 +20,10 @@ const AddTask = ({ priorityArray, createDocument }) => {
                     id="title"
                     placeholder="Title of your task"
                     value={titleVal}
-                    onChange={handleTitleChange}
-                    className={`bg-inherit border rounded-sm p-2 focus:outline-none focus:ring-1 ${
-                        titleValidationError
-                            ? "border-error focus:ring-red-500 invalid:focus:ring-red-600"
-                            : "border-input focus:ring-slate-900"
-                    }`}
+                    onChange={(e) => setTitleVal(e.target.value)}
+                    className="bg-inherit border rounded-sm p-2 focus:outline-none focus:ring-1 border-input focus:ring-slate-900"
                 />
-                {titleValidationError && (
-                    <span className="text-error mt-1">{titleValidationError}</span>
-                )}
-            </div>
+                </div>
             <div className="flex flex-col mb-6">
                 <label htmlFor="description" className="mb-1">
                     Task Description
@@ -95,20 +34,11 @@ const AddTask = ({ priorityArray, createDocument }) => {
                     maxLength={200}
                     value={textAreaVal}
                     onChange={(e) => setTextAreaVal(e.target.value)}
-                    className={`bg-inherit border rounded-sm p-2 h-32 resize-none focus:outline-none focus:ring-1 ${
-                        textAreaVal.length > 197
-                            ? "border-error focus:ring-red-500 invalid:focus:ring-red-600"
-                            : "border-input focus:ring-slate-900"
-                    }`}
+                    className="bg-inherit border rounded-sm p-2 h-32 resize-none focus:outline-none focus:ring-1 border-input focus:ring-slate-900"
                 />
-                {textAreaVal.length > 197 && (
-                    <span className="text-error mt-1">
-                        Warning description getting too long. Can only be 200 characters
-                    </span>
-                )}
             </div>
             <div className="flex flex-col mb-6">
-                <label htmlFor="priority" className="mb-1">
+                <label htmlFor="description" className="mb-1">
                     Task Priority
                 </label>
                 <Select
@@ -116,14 +46,14 @@ const AddTask = ({ priorityArray, createDocument }) => {
                     selectOptions={priorityArray}
                     handleSelectChange={(e) => setPriority(e.target.value)}
                 />
-            </div>
+                </div>
             <div className="flex flex-col mb-6">
-                <label htmlFor="dueDate" className="mb-1">
+                <label htmlFor="description" className="mb-1">
                     Task Due Date
                 </label>
                 <input
                     type="date"
-                    id="dueDate"
+                    id="date"
                     value={dueDate!.toISOString().split("T")[0]}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setDueDate(new Date(e.target.value))}
@@ -132,11 +62,11 @@ const AddTask = ({ priorityArray, createDocument }) => {
             </div>
             <Button
                 type="submit"
-                disable={isSubmitting}
-                extraBtnClasses="bg-primary justify-center text-white font-semibold px-4 py-2 outline-1 hover:bg-primaryHover focus:ring-1 focus:ring-pink-800 w-full"
-            >
-                <span>Add Task</span>
-            </Button>
+                content={{
+                    text: "Add Task",
+                }}
+                extraBtnClasses="bg-pink-700 justify-center text-white font-semibold px-4 py-2 outline-1 hover:bg-pink-800 focus:ring-1 focus:ring-pink-800 w-full"
+            />
         </form>
     );
 };
