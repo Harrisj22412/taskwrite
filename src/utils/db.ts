@@ -1,5 +1,6 @@
 import { ID, databases } from "./appwrite";
 import { IPayload } from "../models/interface";
+import { Query } from "appwrite";
 
 const dbID: string = import.meta.env.VITE_APPWRITE_DB_ID;
 const collectionID: string = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
@@ -31,4 +32,21 @@ const deleteDocument = async (id: string) => {
     return res;
 };
 
-export { createDocument, readDocuments, updateDocument, deleteDocument };
+const searchTasks = async (searchTerm: string) => {
+    const resTitle = await databases.listDocuments(dbID, collectionID, [
+                        Query.search("title", searchTerm),
+                    ]);
+    const resDesc = await databases.listDocuments(dbID, collectionID, [
+                        Query.search("description", searchTerm),
+                     ]);
+    const res = [...resTitle.documents, ...resDesc.documents];
+
+    const uniqueRes = res.filter(
+        (task, index, self) => index === self.findIndex((t) => t.$id ===                  task.$id)
+    );
+
+    return uniqueRes;
+    
+};
+
+export { createDocument, readDocuments, updateDocument, deleteDocument, searchTasks };

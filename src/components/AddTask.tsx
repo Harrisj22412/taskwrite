@@ -3,9 +3,10 @@ import Select from "./Select";
 import Button from "./Button";
 import Speaker from "./Speaker";
 import { useNavigate } from "react-router-dom";
-import { createDocument } from "../utils/db.ts";
+import { createDocument, updateDocument  } from "../utils/db.ts";
 import{ useSpeechToTextHelper } from "../hooks/useSpeechToTextHelper";
 import { SparklesIcon } from "@heroicons/react/24/solid";
+import { getTasks } from "../utils/shared";
 
 interface ITaskFormProps {
     task: ITask | null;

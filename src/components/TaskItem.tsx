@@ -3,6 +3,7 @@ import  Button  from "./Button";
 import { useNavigate } from "react-router-dom";
 import { deleteDocument} from "../utils/db";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { getTasks } from "../utils/shared";
 
 interface TaskItemProps {
     isViewTask: boolean; handleViewTask?: (e: React.MouseEvent<HTMLDivElement>) => void;  
@@ -76,8 +77,9 @@ function TaskItem({
 
     return (
     <>
-        <div className="m-8 cursor-pointer border border-container rounded-md p-4 hover:shadow-lg transition duration-300 ease-in-out max-h-96">
+        <div className="m-8 cursor-pointer border border-container rounded-md p-4 hover:shadow-lg transition duration-300 ease-in-out max-h-96"
         onClick={handleViewTask}
+        >
             <section
             key={task.$id}
             className="flex flex-col justify-between gap-2 my-4 h-full"

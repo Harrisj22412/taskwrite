@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { getTasks } from "../utils/shared";
 import  TaskItem  from "../components/TaskItem";
+import { useNavigate } from "react-router-dom";
+import Search from "../components/Search";
+
+
+import { ITask } from "../models/interface";
+import Dialog from "../components/Dialog";
+import Button from "../components/Button";
+import { PlusIcon } from "@heroicons/react/24/solid";
+
+
+
+
 
 const Task = () => {
 
@@ -9,6 +21,8 @@ const Task = () => {
 
     const [isViewTask, setIsViewTask] = useState(false);
     const [selectedTask, setSelectedTask] = useState<ITask>();
+
+    const navigate = useNavigate();
 
     const handleViewTask = (
         e: React.MouseEvent<HTMLDivElement>,
@@ -47,6 +61,16 @@ useEffect(() => {
         <h1 className="text-4xl md:text-7xl font-bold text-center py-3 mb-16">
         Your Tasks
         </h1>
+        <div className="m-8 flex flex-col-reverse md:flex-row gap-8 items-start                     md:items-center md:justify-between">
+    <Search />
+    <Button
+        handleClick={() => navigate("/")}
+        extraBtnClasses="bg-primary text-white font-medium py-2 hover:bg-    primaryHover ml-auto"
+    >
+        <span>Add Task</span>
+        <PlusIcon height={25} className="hidden md:flex" />
+    </Button>
+</div>
         {tasksError ? (
             <span className="m-8 text-error">{tasksError}</span>
         ) : (
