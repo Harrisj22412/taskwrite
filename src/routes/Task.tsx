@@ -3,6 +3,7 @@ import { getTasks } from "../utils/shared";
 import  TaskItem  from "../components/TaskItem";
 import { useNavigate } from "react-router-dom";
 import Search from "../components/Search";
+import Select from "../components/Select";
 
 
 import { ITask } from "../models/interface";
@@ -105,9 +106,6 @@ useEffect(() => {
                 />
             </Dialog>
         )}
-        <h1 className="text-4xl md:text-7xl font-bold text-center py-3 mb-16">
-        Your Tasks
-        </h1>
         <h1 className="text-4xl md:text-7xl font-bold text-center py-3 mb-16">
         Your Tasks
         </h1>
