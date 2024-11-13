@@ -24,6 +24,56 @@ const Task = () => {
 
     const navigate = useNavigate();
 
+    const sortByPriority = (tasksList: ITask[], isAsc: boolean): ITask[] => {
+        const priorityOrder: { [key: string]: number } = {
+        low: 1,
+        medium: 2,
+        high: 3,
+        };
+    
+        return [...tasksList].sort((a, b) => {
+        const priorityA = priorityOrder[a.priority!.toLowerCase()];
+        const priorityB = priorityOrder[b.priority!.toLowerCase()];
+        return isAsc ? priorityA - priorityB : priorityB - priorityA;
+        });
+    };
+    
+    const handleSelectChange = async (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        const selectedOption = e.target.value;
+        const doneTasks = tasks.filter((task) => task.done);
+    
+        switch (selectedOption) {
+            case "priority - (low - high)":
+            case "priority - (high - low)": {
+                const isAsc = selectedOption === "priority - (low - high)";
+                const sortedTasks = sortByPriority(tasks, isAsc);
+                setTasks([...doneTasks, ...sortedTasks.filter((task) =>                           !task.done)]);
+                break;
+            }
+            case "due date - (earliest - latest)":
+            case "due date - (latest - earliest)": {
+                const isEarliestToLatest =
+                selectedOption === "due date - (earliest - latest)";
+                const dueDateResult = await sortByDueDate(isEarliestToLatest);
+                const sortedTasks = dueDateResult.documents as ITask[];
+                setTasks([...doneTasks, ...sortedTasks.filter((task) =>                            !task.done)]);
+                break;
+            }
+            default:
+                break;
+            }
+    };
+    
+
+    const selectArray = [
+        "priority - (low - high)",
+        "priority - (high - low)",
+        "due date - (earliest - latest)",
+        "due date - (latest - earliest)",
+    ];
+
     const handleViewTask = (
         e: React.MouseEvent<HTMLDivElement>,
         activeTask: ITask
@@ -92,6 +142,14 @@ useEffect(() => {
                 </div>
                 <div className="flex-1">
                     <h3 className="text-2xl font-bold m-8">Completed Tasks</h3>
+                    <div className="m-8 flex items-start lg:items-center gap-1 justify-between flex-col lg:flex-row">
+    <span className="font-medium">Sort Tasks by: </span>
+    <Select
+        defaultSelectValue={selectArray[0]}
+        handleSelectChange={handleSelectChange}
+        selectOptions={selectArray}
+    />
+</div>
                     <div>
                         {tasks
                             .filter((task) => task.done)

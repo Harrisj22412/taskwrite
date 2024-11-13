@@ -49,4 +49,12 @@ const searchTasks = async (searchTerm: string) => {
     
 };
 
-export { createDocument, readDocuments, updateDocument, deleteDocument, searchTasks };
+const sortByDueDate = async (isEarliestToLatest: boolean) => {
+    const orderQuery = isEarliestToLatest
+        ? Query.orderAsc("due_date")
+        : Query.orderDesc("due_date");
+    const res = await databases.listDocuments(dbID, collectionID,              [orderQuery]);
+    return res;
+};
+
+export { createDocument, readDocuments, updateDocument, deleteDocument, searchTasks, sortByDueDate };
